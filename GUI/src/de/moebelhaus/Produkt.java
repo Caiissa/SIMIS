@@ -3,13 +3,13 @@ package de.moebelhaus;
 public class Produkt {
 
     private int id;
-    private String name;
-    private int bestand;
+    private String vorname;
+    private String nachname;
 
-    public Produkt(int id, String name, int bestand) {
+    public Produkt(int id, String vorname, String nachname) {
         this.id = id;
-        this.name = name;
-        this.bestand = bestand;
+        this.vorname = vorname;
+        this.nachname = nachname;
     }
 
     public int getId() {
@@ -17,10 +17,10 @@ public class Produkt {
     }
 
     public String getName() {
-        return name;
+        return vorname;
     }
 
-    public int getBestand() {
-        return bestand;
+    public String getBestand() {
+        return nachname;
     }
 }

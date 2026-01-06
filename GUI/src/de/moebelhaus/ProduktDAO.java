@@ -10,7 +10,7 @@ public class ProduktDAO {
 
         List<Produkt> produkte = new ArrayList<>();
 
-        String sql = "SELECT id, name, bestand FROM produkte";
+        String sql = "SELECT KUNDEID, VORNAME, NACHNAME FROM KUNDE";
 
         try (Connection con = DBConnection.getConnection();
              Statement stmt = con.createStatement();
@@ -19,9 +19,9 @@ public class ProduktDAO {
             while (rs.next()) {
                 produkte.add(
                         new Produkt(
-                                rs.getInt("id"),
-                                rs.getString("name"),
-                                rs.getInt("bestand")
+                                rs.getInt("KUNDEID"),
+                                rs.getString("VORNAME"),
+                                rs.getString("NACHNAME")
                         )
                 );
             }
