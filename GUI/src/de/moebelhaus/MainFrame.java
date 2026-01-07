@@ -1,44 +1,64 @@
 package de.moebelhaus;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
 public class MainFrame extends JFrame {
 
-    private JTable table;
-    private DefaultTableModel tableModel;
-
     public MainFrame() {
-        setTitle("Möbelhaus – Bestand");
-        setSize(700, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("SIMIS.com");
+        setSize(1100, 700);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        initUI();
-        ladeDaten();
+        setLayout(new BorderLayout());
+        getContentPane().setBackground(Color.WHITE);
+
+        add(createHeader(), BorderLayout.NORTH);
+        add(createSidebar(), BorderLayout.WEST);
+        add(new ProduktPanel(), BorderLayout.CENTER);
     }
 
-    private void initUI() {
-        tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Name", "Bestand"}, 0
-        );
+    private JPanel createHeader() {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(Color.WHITE);
+        header.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
+        JLabel logo = new JLabel("SIMIS");
+        logo.setFont(new Font("SansSerif", Font.BOLD, 28));
 
-        add(scrollPane, BorderLayout.CENTER);
+        JTextField suche = new JTextField("Produkte suchen...");
+        suche.setPreferredSize(new Dimension(300, 35));
+
+        header.add(logo, BorderLayout.WEST);
+        header.add(suche, BorderLayout.EAST);
+
+        return header;
     }
 
-    private void ladeDaten() {
-        List<Produkt> produkte = ProduktDAO.getAlleProdukte();
+    private JPanel createSidebar() {
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBackground(new Color(245, 245, 245));
+        sidebar.setPreferredSize(new Dimension(200, 0));
 
-        for (Produkt p : produkte) {
-            tableModel.addRow(
-                    new Object[]{p.getId(), p.getName(), p.getBestand()}
-            );
-        }
+        sidebar.add(createCategoryButton("Sofas"));
+        sidebar.add(createCategoryButton("Tische"));
+        sidebar.add(createCategoryButton("Stühle"));
+        sidebar.add(createCategoryButton("Schränke"));
+
+        return sidebar;
+    }
+
+    private JButton createCategoryButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setMaximumSize(new Dimension(180, 45));
+        btn.setFocusPainted(false);
+        btn.setBackground(Color.WHITE);
+        btn.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return btn;
     }
 
     public static void main(String[] args) {
