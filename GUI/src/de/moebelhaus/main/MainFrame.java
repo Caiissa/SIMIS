@@ -2,6 +2,7 @@ package de.moebelhaus.main;
 
 import de.moebelhaus.kunden.KundenPanel;
 import de.moebelhaus.produkte.ProduktPanel;
+import de.moebelhaus.lager.LagerPanel;
 
 
 import javax.swing.*;
@@ -35,11 +36,13 @@ public class MainFrame extends JFrame {
 
         JButton kundenBtn = new JButton("Kunden");
         JButton produkteBtn = new JButton("Produkte");
+        JButton lagerBtn = new JButton("Lager");
 
         kundenBtn.addActionListener(e -> showPanel(new KundenPanel()));
         produkteBtn.addActionListener(e -> showPanel(new ProduktPanel()));
+        lagerBtn.addActionListener(e -> showPanel(new LagerPanel()));
 
-
+        menu.add(lagerBtn);
         menu.add(kundenBtn);
         menu.add(produkteBtn);
 
