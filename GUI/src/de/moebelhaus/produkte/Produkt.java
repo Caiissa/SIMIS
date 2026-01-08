@@ -1,4 +1,4 @@
-package de.moebelhaus;
+package de.moebelhaus.produkte;
 
 public class Produkt {
 

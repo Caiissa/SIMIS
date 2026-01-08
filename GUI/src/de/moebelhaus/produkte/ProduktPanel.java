@@ -1,4 +1,4 @@
-package de.moebelhaus;
+package de.moebelhaus.produkte;
 
 import javax.swing.*;
 import java.awt.*;

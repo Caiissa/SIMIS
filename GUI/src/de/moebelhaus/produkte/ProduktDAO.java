@@ -1,4 +1,6 @@
-package de.moebelhaus;
+package de.moebelhaus.produkte;
+
+import de.moebelhaus.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
