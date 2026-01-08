@@ -12,18 +12,22 @@ public class ProduktDAO {
 
         List<Produkt> produkte = new ArrayList<>();
 
-        String sql = "SELECT KUNDEID, VORNAME, NACHNAME FROM KUNDE";
+        String sql = """
+            SELECT PRODUKTID, NAME, BASISPREIS
+            FROM PRODUKT
+            WHERE AKTIV = 'Y'
+        """;
 
         try (Connection con = DBConnection.getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 produkte.add(
                         new Produkt(
-                                rs.getInt("KUNDEID"),
-                                rs.getString("VORNAME"),
-                                rs.getString("NACHNAME")
+                                rs.getInt("PRODUKTID"),
+                                rs.getString("NAME"),
+                                rs.getDouble("BASISPREIS")
                         )
                 );
             }

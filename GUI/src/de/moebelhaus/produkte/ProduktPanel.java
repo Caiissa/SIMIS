@@ -13,6 +13,11 @@ public class ProduktPanel extends JPanel {
 
         List<Produkt> produkte = ProduktDAO.getAlleProdukte();
 
+        if (produkte.isEmpty()) {
+            add(new JLabel("Keine Produkte vorhanden."));
+            return;
+        }
+
         for (Produkt p : produkte) {
             add(createProduktCard(p));
         }
@@ -27,21 +32,32 @@ public class ProduktPanel extends JPanel {
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
-        JLabel name = new JLabel(p.getName());
-        name.setFont(new Font("SansSerif", Font.BOLD, 18));
+        JLabel nameLabel = new JLabel(p.getName());
+        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-        JLabel bestand = new JLabel("Bestand: " + p.getBestand());
-        bestand.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        JLabel preisLabel = new JLabel(String.format("Preis: %.2f €", p.getBasispreis()));
+        preisLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-        JButton details = new JButton("Details");
-        details.setBackground(new Color(255, 204, 0)); // IKEA-Gelb
-        details.setFocusPainted(false);
+        JButton detailsButton = new JButton("Details");
+        detailsButton.setBackground(new Color(255, 204, 0)); // IKEA-Gelb
+        detailsButton.setFocusPainted(false);
+        detailsButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        card.add(name);
+        // (Vorbereitung für später)
+        detailsButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Produkt-ID: " + p.getProduktId(),
+                    "Produktdetails",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+
+        card.add(nameLabel);
         card.add(Box.createVerticalStrut(10));
-        card.add(bestand);
+        card.add(preisLabel);
         card.add(Box.createVerticalStrut(15));
-        card.add(details);
+        card.add(detailsButton);
 
         return card;
     }
