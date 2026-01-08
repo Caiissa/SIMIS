@@ -1,64 +1,58 @@
 package de.moebelhaus.produkte;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 public class ProduktPanel extends JPanel {
 
+    private DefaultTableModel model;
+
     public ProduktPanel() {
-        setBackground(Color.WHITE);
-        setLayout(new GridLayout(0, 3, 20, 20));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
 
-        List<Produkt> produkte = ProduktDAO.getAlleProdukte();
+        // 🔍 Suchleiste
+        JTextField sucheField = new JTextField();
+        JButton suchenBtn = new JButton("Suchen");
 
-        if (produkte.isEmpty()) {
-            add(new JLabel("Keine Produkte vorhanden."));
-            return;
-        }
+        JPanel top = new JPanel(new BorderLayout(10, 0));
+        top.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        top.add(new JLabel("Produkt suchen:"), BorderLayout.WEST);
+        top.add(sucheField, BorderLayout.CENTER);
+        top.add(suchenBtn, BorderLayout.EAST);
 
-        for (Produkt p : produkte) {
-            add(createProduktCard(p));
-        }
+        add(top, BorderLayout.NORTH);
+
+        // 📋 Tabelle
+        model = new DefaultTableModel(
+                new Object[]{"ID", "Name", "Basispreis (€)", "Aktiv"}, 0
+        );
+
+        JTable table = new JTable(model);
+        table.setFillsViewportHeight(true);
+
+        add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // 🔄 Button-Logik
+        suchenBtn.addActionListener(e -> ladeProdukte(sucheField.getText()));
+
+        // Initial: alle Produkte laden
+        ladeProdukte("");
     }
 
-    private JPanel createProduktCard(Produkt p) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220)),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
+    private void ladeProdukte(String suchtext) {
+        model.setRowCount(0);
 
-        JLabel nameLabel = new JLabel(p.getName());
-        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        List<Produkt> produkte = ProduktDAO.searchProdukte(suchtext);
 
-        JLabel preisLabel = new JLabel(String.format("Preis: %.2f €", p.getBasispreis()));
-        preisLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-
-        JButton detailsButton = new JButton("Details");
-        detailsButton.setBackground(new Color(255, 204, 0)); // IKEA-Gelb
-        detailsButton.setFocusPainted(false);
-        detailsButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // (Vorbereitung für später)
-        detailsButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Produkt-ID: " + p.getProduktId(),
-                    "Produktdetails",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-        });
-
-        card.add(nameLabel);
-        card.add(Box.createVerticalStrut(10));
-        card.add(preisLabel);
-        card.add(Box.createVerticalStrut(15));
-        card.add(detailsButton);
-
-        return card;
+        for (Produkt p : produkte) {
+            model.addRow(new Object[]{
+                    p.getProduktId(),
+                    p.getName(),
+                    String.format("%.2f", p.getBasispreis()),
+                    p.isAktiv() ? "Ja" : "Nein"
+            });
+        }
     }
 }
