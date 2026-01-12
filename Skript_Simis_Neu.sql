@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      ORACLE Version 19c                           */
-/* Created on:     08.01.2026 15:30:14                          */
+/* Created on:     12.01.2026 14:12:00                          */
 /*==============================================================*/
 
 
@@ -54,6 +54,12 @@ alter table PRODUKTVARIANTE
 
 alter table PRODUKTVARIANTE
    drop constraint FK_PRODUKTV_RELATIONS_MATERIAL;
+
+alter table RELATIONSHIP_28
+   drop constraint FK_RELATION_BESTEHT_PRODUKTV;
+
+alter table RELATIONSHIP_28
+   drop constraint FK_RELATION_KANN_VERKAUF;
 
 alter table RUECKGABE
    drop constraint FK_RUECKGAB_KUNDE_RUE_KUNDE;
@@ -139,6 +145,12 @@ drop table PRODUKTVARIANTE cascade constraints;
 
 drop table RABATT cascade constraints;
 
+drop index KANN_FK;
+
+drop index BESTEHT_FK;
+
+drop table RELATIONSHIP_28 cascade constraints;
+
 drop index RELATIONSHIP_26_FK;
 
 drop index VERKAUF_RUECKGABE_FK;
@@ -184,7 +196,7 @@ create table BEWERTUNG (
    BEWERTUNGSID         NUMBER(20,0)          not null,
    KUNDEID              NUMBER(20,0),
    DATUM                DATE                  not null,
-   STERNE               NUMBER(1,1)          default 0  not null
+   STERNE               NUMBER(2,1)          default 0  not null
       constraint CKC_STERNE_BEWERTUN check (STERNE <= 5),
    KOMMENTAR            VARCHAR2(1000),
    constraint PK_BEWERTUNG primary key (BEWERTUNGSID)
@@ -340,7 +352,6 @@ create index LIEFERT_FK on LIEFERANT_PRODUKT (
 /*==============================================================*/
 create table MATERIAL (
    MATERIALID           NUMBER(20,0)          not null,
-   LIEFERANTID          INTEGER               not null,
    BEZEICHNUNG          VARCHAR2(50),
    BESCHREIBUNG         VARCHAR2(1000),
    constraint PK_MATERIAL primary key (MATERIALID)
@@ -484,6 +495,29 @@ create table RABATT (
 );
 
 /*==============================================================*/
+/* Table: RELATIONSHIP_28                                       */
+/*==============================================================*/
+create table RELATIONSHIP_28 (
+   VARIANTEID           NUMBER(20,0)          not null,
+   VERKAUFID            NUMBER(20,0)          not null,
+   constraint PK_RELATIONSHIP_28 primary key (VARIANTEID, VERKAUFID)
+);
+
+/*==============================================================*/
+/* Index: BESTEHT_FK                                            */
+/*==============================================================*/
+create index BESTEHT_FK on RELATIONSHIP_28 (
+   VARIANTEID ASC
+);
+
+/*==============================================================*/
+/* Index: KANN_FK                                               */
+/*==============================================================*/
+create index KANN_FK on RELATIONSHIP_28 (
+   VERKAUFID ASC
+);
+
+/*==============================================================*/
 /* Table: RUECKGABE                                             */
 /*==============================================================*/
 create table RUECKGABE (
@@ -526,8 +560,7 @@ create table VERKAUF (
    ZAHLUNGSARTID        NUMBER(20,0)          not null,
    FILIALEID            NUMBER(20,0),
    KUNDEID              NUMBER(20,0),
-   ANZAHL               INTEGER,
-   GESAMTPREIS          FLOAT(10),
+   ANZAHL               NUMBER(20,0),
    DATUM                DATE,
    ZAHLUNGSTATUS        CHAR(1)              default 'N'
       constraint CKC_ZAHLUNGSTATUS_VERKAUF check (ZAHLUNGSTATUS is null or (ZAHLUNGSTATUS in ('Y','N'))),
@@ -633,6 +666,14 @@ alter table PRODUKTVARIANTE
 alter table PRODUKTVARIANTE
    add constraint FK_PRODUKTV_RELATIONS_MATERIAL foreign key (MATERIALID)
       references MATERIAL (MATERIALID);
+
+alter table RELATIONSHIP_28
+   add constraint FK_RELATION_BESTEHT_PRODUKTV foreign key (VARIANTEID)
+      references PRODUKTVARIANTE (VARIANTEID);
+
+alter table RELATIONSHIP_28
+   add constraint FK_RELATION_KANN_VERKAUF foreign key (VERKAUFID)
+      references VERKAUF (VERKAUFID);
 
 alter table RUECKGABE
    add constraint FK_RUECKGAB_KUNDE_RUE_KUNDE foreign key (KUNDEID)
