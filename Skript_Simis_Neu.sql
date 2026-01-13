@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      ORACLE Version 19c                           */
-/* Created on:     12.01.2026 14:12:00                          */
+/* Created on:     13.01.2026 12:35:20                          */
 /*==============================================================*/
 
 
@@ -40,9 +40,6 @@ alter table PRODUKT
 alter table PRODUKT
    drop constraint FK_PRODUKT_PRODUKT_A_RABATT;
 
-alter table PRODUKT
-   drop constraint FK_PRODUKT_PRODUKT_L_LAGER;
-
 alter table PRODUKTVARIANTE
    drop constraint FK_PRODUKTV_FARBE_PRO_FARBE;
 
@@ -55,11 +52,11 @@ alter table PRODUKTVARIANTE
 alter table PRODUKTVARIANTE
    drop constraint FK_PRODUKTV_RELATIONS_MATERIAL;
 
-alter table RELATIONSHIP_28
-   drop constraint FK_RELATION_BESTEHT_PRODUKTV;
+alter table PRODUKT_LAGER
+   drop constraint "FK_PRODUKT__BEFINDET _LAGER";
 
-alter table RELATIONSHIP_28
-   drop constraint FK_RELATION_KANN_VERKAUF;
+alter table PRODUKT_LAGER
+   drop constraint FK_PRODUKT__BEINHALTE_PRODUKT;
 
 alter table RUECKGABE
    drop constraint FK_RUECKGAB_KUNDE_RUE_KUNDE;
@@ -78,6 +75,12 @@ alter table VERKAUF
 
 alter table VERKAUF
    drop constraint FK_VERKAUF_ZAHLUNGSA_ZAHLUNGS;
+
+alter table VERKAUF_PRODUKTVARIANTE
+   drop constraint FK_VERKAUF__BESTEHT_PRODUKTV;
+
+alter table VERKAUF_PRODUKTVARIANTE
+   drop constraint FK_VERKAUF__KANN_VERKAUF;
 
 drop index FILIALE_BESTELLUNG_FK;
 
@@ -107,9 +110,9 @@ drop table LAGERBEWEGUNG cascade constraints;
 
 drop table LIEFERANT cascade constraints;
 
-drop index LIEFERT_FK;
-
 drop index WIRD_GELIEFERT_VON_FK;
+
+drop index LIEFERT_FK;
 
 drop table LIEFERANT_PRODUKT cascade constraints;
 
@@ -118,8 +121,6 @@ drop table MATERIAL cascade constraints;
 drop index PRODUKT_PREIS_HISTORY_FK;
 
 drop table PREIS_HISTORIE cascade constraints;
-
-drop index PRODUKT_LAGER_FK;
 
 drop index BESTELLUNG_PRODUKT_FK;
 
@@ -143,13 +144,13 @@ drop index PRODUKT_PRODUKTVARIANTE_FK;
 
 drop table PRODUKTVARIANTE cascade constraints;
 
+drop index BEINHALTET_FK;
+
+drop index BEFINDET_SICH_FK;
+
+drop table PRODUKT_LAGER cascade constraints;
+
 drop table RABATT cascade constraints;
-
-drop index KANN_FK;
-
-drop index BESTEHT_FK;
-
-drop table RELATIONSHIP_28 cascade constraints;
 
 drop index RELATIONSHIP_26_FK;
 
@@ -166,6 +167,12 @@ drop index VERKAUF_KUNDE_FK;
 drop index FILIALE_VERKAUF_FK;
 
 drop table VERKAUF cascade constraints;
+
+drop index KANN_FK;
+
+drop index BESTEHT_FK;
+
+drop table VERKAUF_PRODUKTVARIANTE cascade constraints;
 
 drop table ZAHLUNGSART cascade constraints;
 
@@ -334,16 +341,16 @@ create table LIEFERANT_PRODUKT (
 );
 
 /*==============================================================*/
-/* Index: WIRD_GELIEFERT_VON_FK                                 */
+/* Index: LIEFERT_FK                                            */
 /*==============================================================*/
-create index WIRD_GELIEFERT_VON_FK on LIEFERANT_PRODUKT (
+create index LIEFERT_FK on LIEFERANT_PRODUKT (
    LIEFERANTID ASC
 );
 
 /*==============================================================*/
-/* Index: LIEFERT_FK                                            */
+/* Index: WIRD_GELIEFERT_VON_FK                                 */
 /*==============================================================*/
-create index LIEFERT_FK on LIEFERANT_PRODUKT (
+create index WIRD_GELIEFERT_VON_FK on LIEFERANT_PRODUKT (
    PRODUKTID ASC
 );
 
@@ -384,7 +391,6 @@ create table PRODUKT (
    AKTIONID             NUMBER(20,0),
    BESTELLUNGID         NUMBER(20,0),
    BEWERTUNGSID         NUMBER(20,0),
-   LAGERID              NUMBER(20,0),
    KATEGORIEID          NUMBER(20,0)          not null,
    AKTIV                CHAR(1)              default 'N'  not null
       constraint CKC_AKTIV_PRODUKT check (AKTIV in ('Y','N')),
@@ -420,13 +426,6 @@ create index BEWERTUNG_PRODUKT_FK on PRODUKT (
 /*==============================================================*/
 create index BESTELLUNG_PRODUKT_FK on PRODUKT (
    BESTELLUNGID ASC
-);
-
-/*==============================================================*/
-/* Index: PRODUKT_LAGER_FK                                      */
-/*==============================================================*/
-create index PRODUKT_LAGER_FK on PRODUKT (
-   LAGERID ASC
 );
 
 /*==============================================================*/
@@ -483,38 +482,38 @@ create index GROESSE_PRODUKT_FK on PRODUKTVARIANTE (
 );
 
 /*==============================================================*/
+/* Table: PRODUKT_LAGER                                         */
+/*==============================================================*/
+create table PRODUKT_LAGER (
+   LAGERID              NUMBER(20,0)          not null,
+   PRODUKTID            NUMBER(20,0)          not null,
+   constraint PK_PRODUKT_LAGER primary key (LAGERID, PRODUKTID)
+);
+
+/*==============================================================*/
+/* Index: BEFINDET_SICH_FK                                      */
+/*==============================================================*/
+create index BEFINDET_SICH_FK on PRODUKT_LAGER (
+   LAGERID ASC
+);
+
+/*==============================================================*/
+/* Index: BEINHALTET_FK                                         */
+/*==============================================================*/
+create index BEINHALTET_FK on PRODUKT_LAGER (
+   PRODUKTID ASC
+);
+
+/*==============================================================*/
 /* Table: RABATT                                                */
 /*==============================================================*/
 create table RABATT (
    AKTIONID             NUMBER(20,0)          not null,
-   RAPATT_PROZENT       NUMBER(3,2)           not null,
-   "START"              DATE                  not null,
-   END                  DATE,
+   RABATT_PROZENT       NUMBER(3,2)           not null,
+   START_DATUM          DATE                  not null,
+   END_DATUM            DATE,
    BEZEICHNUG           VARCHAR2(50),
    constraint PK_RABATT primary key (AKTIONID)
-);
-
-/*==============================================================*/
-/* Table: RELATIONSHIP_28                                       */
-/*==============================================================*/
-create table RELATIONSHIP_28 (
-   VARIANTEID           NUMBER(20,0)          not null,
-   VERKAUFID            NUMBER(20,0)          not null,
-   constraint PK_RELATIONSHIP_28 primary key (VARIANTEID, VERKAUFID)
-);
-
-/*==============================================================*/
-/* Index: BESTEHT_FK                                            */
-/*==============================================================*/
-create index BESTEHT_FK on RELATIONSHIP_28 (
-   VARIANTEID ASC
-);
-
-/*==============================================================*/
-/* Index: KANN_FK                                               */
-/*==============================================================*/
-create index KANN_FK on RELATIONSHIP_28 (
-   VERKAUFID ASC
 );
 
 /*==============================================================*/
@@ -591,6 +590,29 @@ create index ZAHLUNGSART_VERKAUF_FK on VERKAUF (
 );
 
 /*==============================================================*/
+/* Table: VERKAUF_PRODUKTVARIANTE                               */
+/*==============================================================*/
+create table VERKAUF_PRODUKTVARIANTE (
+   VARIANTEID           NUMBER(20,0)          not null,
+   VERKAUFID            NUMBER(20,0)          not null,
+   constraint PK_VERKAUF_PRODUKTVARIANTE primary key (VARIANTEID, VERKAUFID)
+);
+
+/*==============================================================*/
+/* Index: BESTEHT_FK                                            */
+/*==============================================================*/
+create index BESTEHT_FK on VERKAUF_PRODUKTVARIANTE (
+   VARIANTEID ASC
+);
+
+/*==============================================================*/
+/* Index: KANN_FK                                               */
+/*==============================================================*/
+create index KANN_FK on VERKAUF_PRODUKTVARIANTE (
+   VERKAUFID ASC
+);
+
+/*==============================================================*/
 /* Table: ZAHLUNGSART                                           */
 /*==============================================================*/
 create table ZAHLUNGSART (
@@ -647,10 +669,6 @@ alter table PRODUKT
    add constraint FK_PRODUKT_PRODUKT_A_RABATT foreign key (AKTIONID)
       references RABATT (AKTIONID);
 
-alter table PRODUKT
-   add constraint FK_PRODUKT_PRODUKT_L_LAGER foreign key (LAGERID)
-      references LAGER (LAGERID);
-
 alter table PRODUKTVARIANTE
    add constraint FK_PRODUKTV_FARBE_PRO_FARBE foreign key (FARBENID)
       references FARBE (FARBENID);
@@ -667,13 +685,13 @@ alter table PRODUKTVARIANTE
    add constraint FK_PRODUKTV_RELATIONS_MATERIAL foreign key (MATERIALID)
       references MATERIAL (MATERIALID);
 
-alter table RELATIONSHIP_28
-   add constraint FK_RELATION_BESTEHT_PRODUKTV foreign key (VARIANTEID)
-      references PRODUKTVARIANTE (VARIANTEID);
+alter table PRODUKT_LAGER
+   add constraint "FK_PRODUKT__BEFINDET _LAGER" foreign key (LAGERID)
+      references LAGER (LAGERID);
 
-alter table RELATIONSHIP_28
-   add constraint FK_RELATION_KANN_VERKAUF foreign key (VERKAUFID)
-      references VERKAUF (VERKAUFID);
+alter table PRODUKT_LAGER
+   add constraint FK_PRODUKT__BEINHALTE_PRODUKT foreign key (PRODUKTID)
+      references PRODUKT (PRODUKTID);
 
 alter table RUECKGABE
    add constraint FK_RUECKGAB_KUNDE_RUE_KUNDE foreign key (KUNDEID)
@@ -698,4 +716,12 @@ alter table VERKAUF
 alter table VERKAUF
    add constraint FK_VERKAUF_ZAHLUNGSA_ZAHLUNGS foreign key (ZAHLUNGSARTID)
       references ZAHLUNGSART (ZAHLUNGSARTID);
+
+alter table VERKAUF_PRODUKTVARIANTE
+   add constraint FK_VERKAUF__BESTEHT_PRODUKTV foreign key (VARIANTEID)
+      references PRODUKTVARIANTE (VARIANTEID);
+
+alter table VERKAUF_PRODUKTVARIANTE
+   add constraint FK_VERKAUF__KANN_VERKAUF foreign key (VERKAUFID)
+      references VERKAUF (VERKAUFID);
 
