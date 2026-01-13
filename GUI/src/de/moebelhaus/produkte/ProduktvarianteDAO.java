@@ -17,7 +17,7 @@ public class ProduktvarianteDAO {
                    f.BEZEICHNUNG AS FARBE,
                    g.BESCHREIBUNG AS GROESSE,
                    m.BEZEICHNUNG AS MATERIAL,
-                   pv.PREIS,
+                   pv.PREISVARIANTEN AS PREIS,
                    pv.VERFUEGBAR
             FROM PRODUKTVARIANTE pv
             JOIN FARBE f ON pv.FARBENID = f.FARBENID
