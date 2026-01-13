@@ -1,5 +1,8 @@
 package de.moebelhaus.kunden;
 
+import de.moebelhaus.produkte.Produkt;
+import de.moebelhaus.produkte.ProduktDAO;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -29,6 +32,8 @@ public class KundenPanel extends JPanel {
         JTable table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
+        loadKunden("");
+
         suchenBtn.addActionListener(e -> {
             model.setRowCount(0);
             List<Kunde> kunden = KundeDAO.searchKunden(sucheField.getText());
@@ -38,5 +43,15 @@ public class KundenPanel extends JPanel {
                 });
             }
         });
+    }
+
+    private void loadKunden(String suchtext) {
+        model.setRowCount(0);
+        List<Kunde> kunden = KundeDAO.searchKunden(suchtext);
+        for (Kunde k : kunden) {
+            model.addRow(new Object[]{
+                    k.getId(), k.getVorname(), k.getNachname(), k.getEmail()
+            });
+        }
     }
 }
