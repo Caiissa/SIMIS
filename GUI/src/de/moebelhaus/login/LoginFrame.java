@@ -29,11 +29,27 @@ public class LoginFrame extends JFrame {
         panel.add(new JLabel());
         panel.add(loginBtn);
 
+        passField.addActionListener(e -> {
+            String user = userField.getText();
+            String pass = new String(passField.getPassword());
+
+            if (user.equals("0") && pass.equals("0")) {
+                dispose();
+                new MainFrame();
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Falsche Zugangsdaten!",
+                        "Login fehlgeschlagen",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
         loginBtn.addActionListener(e -> {
             String user = userField.getText();
             String pass = new String(passField.getPassword());
 
-            if (user.equals("SIMIS") && pass.equals("0000")) {
+            if (user.equals("0") && pass.equals("0")) {
                 dispose();
                 new MainFrame();
             } else {
