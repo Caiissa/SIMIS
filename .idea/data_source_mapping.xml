@@ -3,5 +3,6 @@
   <component name="DataSourcePerFileMappings">
     <file url="file://$PROJECT_DIR$/.idea/queries/Query.sql" value="82f126e8-20e9-4d3d-8cc1-3a1ad61d34ae" />
     <file url="file://$PROJECT_DIR$/GUI/src/de/moebelhaus/produkte/ProduktvarianteDAO.java" value="82f126e8-20e9-4d3d-8cc1-3a1ad61d34ae" />
+    <file url="file://$PROJECT_DIR$/GUI/src/de/moebelhaus/rabatt/RabattDAO.java" value="82f126e8-20e9-4d3d-8cc1-3a1ad61d34ae" />
   </component>
 </project>

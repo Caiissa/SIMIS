@@ -57,9 +57,15 @@ public class MainFrame extends JFrame {
         rabattBtn.addActionListener(e -> showPanel(new RabattPanel()));
         rueckgabeBtn.addActionListener(e -> showPanel(new RueckgabenPanel()));
 
-        menu.add(lagerBtn);
         menu.add(kundenBtn);
         menu.add(produkteBtn);
+        menu.add(lagerBtn);
+        menu.add(bestellungBtn);
+        menu.add(filialenBtn);
+        menu.add(lieferantBtn);
+        menu.add(rabattBtn);
+        menu.add(rueckgabeBtn);
+
 
         return menu;
     }
