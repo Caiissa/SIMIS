@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      ORACLE Version 19c                           */
-/* Created on:     03.12.2025 15:21:53                          */
+/* Created on:     07.01.2026 17:02:40                          */
 /*==============================================================*/
 
 
@@ -136,7 +136,7 @@ drop index GROESSE_PRODUKT_FK;
 
 drop index RELATIONSHIP_9_FK;
 
-drop index FARBE_PRODUKT_KONFIGURATION_FK;
+drop index FARBE_PRODUKT_FK;
 
 drop index PRODUKT_PRODUKTVARIANTE_FK;
 
@@ -166,12 +166,13 @@ drop table ZAHLUNGSART cascade constraints;
 /* Table: BESTELLUNG                                            */
 /*==============================================================*/
 create table BESTELLUNG (
-   BESTELLUNGID         INTEGER               not null,
-   FILIALEID            INTEGER,
-   DATUM_BESTELLUNG     INTEGER               not null,
-   GESAMTBETRAG         INTEGER               not null,
-   MENGE                INTEGER               not null,
-   STATUS               SMALLINT              not null,
+   BESTELLUNGID         NUMBER(20,0)          not null,
+   FILIALEID            NUMBER(20,0),
+   DATUM_BESTELLUNG     DATE                  not null,
+   GESAMTBETRAG         NUMBER(10,2)          not null,
+   MENGE                NUMBER(20,0)          not null,
+   STATUS               CHAR(1)              default 'N'  not null
+      constraint CKC_STATUS_BESTELLU check (STATUS in ('Y','N')),
    constraint PK_BESTELLUNG primary key (BESTELLUNGID)
 );
 
@@ -186,10 +187,11 @@ create index FILIALE_BESTELLUNG_FK on BESTELLUNG (
 /* Table: BEWERTUNG                                             */
 /*==============================================================*/
 create table BEWERTUNG (
-   BEWERTUNGSID         INTEGER               not null,
-   KUNDEID              INTEGER,
+   BEWERTUNGSID         NUMBER(20,0)          not null,
+   KUNDEID              NUMBER(20,0),
    DATUM                DATE                  not null,
-   STERNE               INTEGER               not null,
+   STERNE               NUMBER(1,1)          default 0  not null
+      constraint CKC_STERNE_BEWERTUN check (STERNE <= 5),
    KOMMENTAR            VARCHAR2(1000),
    constraint PK_BEWERTUNG primary key (BEWERTUNGSID)
 );
@@ -205,7 +207,7 @@ create index KUNDE_BEWERTUNG_FK on BEWERTUNG (
 /* Table: FARBE                                                 */
 /*==============================================================*/
 create table FARBE (
-   FARBENID             INTEGER               not null,
+   FARBENID             NUMBER(20,0)          not null,
    BEZEICHNUNG          VARCHAR2(50),
    HEXCODE              CHAR(6),
    constraint PK_FARBE primary key (FARBENID)
@@ -215,15 +217,15 @@ create table FARBE (
 /* Table: FILIALE                                               */
 /*==============================================================*/
 create table FILIALE (
-   FILIALEID            INTEGER               not null,
-   KUNDEID              INTEGER,
+   FILIALEID            NUMBER(20,0)          not null,
+   KUNDEID              NUMBER(20,0),
    NAME                 VARCHAR2(50)          not null,
    ADRESSE              VARCHAR2(50)          not null,
-   PLZ                  INTEGER               not null,
+   PLZ                  VARCHAR2(20)          not null,
    ORT                  VARCHAR2(50)          not null,
-   TELEFON              INTEGER               not null,
+   TELEFON              VARCHAR2(20)          not null,
    OEFFNUNGSZEITEN      DATE,
-   MENGE_VERFUEGBAR     INTEGER,
+   MENGE_VERFUEGBAR     NUMBER(20,0),
    constraint PK_FILIALE primary key (FILIALEID)
 );
 
@@ -238,10 +240,10 @@ create index KUNDE_BESTELLUNG_FK on FILIALE (
 /* Table: GROE_E                                                */
 /*==============================================================*/
 create table GROE_E (
-   GROESSEID            INTEGER               not null,
-   BREITE_CM            INTEGER               not null,
-   HOEHE_CM             INTEGER               not null,
-   TIEFE_CM             INTEGER               not null,
+   GROESSEID            NUMBER(20,0)          not null,
+   BREITE_CM            NUMBER(10,2)          not null,
+   HOEHE_CM             NUMBER(10,2)          not null,
+   TIEFE_CM             NUMBER(10,2)          not null,
    BESCHREIBUNG         VARCHAR2(1000),
    constraint PK_GROE_E primary key (GROESSEID)
 );
@@ -250,17 +252,18 @@ create table GROE_E (
 /* Table: KUNDE                                                 */
 /*==============================================================*/
 create table KUNDE (
-   KUNDEID              INTEGER               not null,
+   KUNDEID              NUMBER(20,0)          not null,
    VORNAME              VARCHAR2(50)          not null,
    NACHNAME             VARCHAR2(50)          not null,
    EMAIL                VARCHAR2(50)          not null,
    ADRESSE              VARCHAR2(100)         not null,
-   PLZ                  INTEGER               not null,
+   PLZ                  VARCHAR2(20)          not null,
    ORT                  VARCHAR2(50)          not null,
    LAND                 VARCHAR2(50)          not null,
-   REGESTRIERT          SMALLINT              not null,
+   REGESTRIERT          CHAR(1)              default 'N'  not null
+      constraint CKC_REGESTRIERT_KUNDE check (REGESTRIERT in ('Y','N')),
    PASSWORT             VARCHAR2(20)          not null,
-   TELEFONNUMMER        INTEGER,
+   TELEFONNUMMER        VARCHAR2(20),
    constraint PK_KUNDE primary key (KUNDEID)
 );
 
@@ -268,9 +271,9 @@ create table KUNDE (
 /* Table: LAGER                                                 */
 /*==============================================================*/
 create table LAGER (
-   LAGERID              INTEGER               not null,
-   BESTELLUNGID         INTEGER,
-   MENGE_VERFUEGBAR     INTEGER               not null,
+   LAGERID              NUMBER(20,0)          not null,
+   BESTELLUNGID         NUMBER(20,0),
+   MENGE_VERFUEGBAR     NUMBER(20,0)          not null,
    constraint PK_LAGER primary key (LAGERID)
 );
 
@@ -285,12 +288,13 @@ create index BESTELLUNG_LAGERBESTAND_FK on LAGER (
 /* Table: LAGERBEWEGUNG                                         */
 /*==============================================================*/
 create table LAGERBEWEGUNG (
-   BEWEGUNGID           INTEGER               not null,
-   LAGERID              INTEGER               not null,
-   FILIALEID            INTEGER,
+   BEWEGUNGID           NUMBER(20,0)          not null,
+   LAGERID              NUMBER(20,0)          not null,
+   FILIALEID            NUMBER(20,0),
    DATUM                DATE                  not null,
-   TRANSPORT            SMALLINT              not null,
-   MENGE                INTEGER               not null,
+   TRANSPORT            CHAR(1)              default 'N'  not null
+      constraint CKC_TRANSPORT_LAGERBEW check (TRANSPORT in ('Y','N')),
+   MENGE                NUMBER(20,0)          not null,
    BEMERKUNG            VARCHAR2(100),
    constraint PK_LAGERBEWEGUNG primary key (BEWEGUNGID)
 );
@@ -313,11 +317,11 @@ create index RELATIONSHIP_27_FK on LAGERBEWEGUNG (
 /* Table: LIEFERANT                                             */
 /*==============================================================*/
 create table LIEFERANT (
-   LIEFERANTID          INTEGER               not null,
+   LIEFERANTID          NUMBER(20,0)          not null,
    NAME                 VARCHAR2(50)          not null,
    EMAIL                VARCHAR2(50)          not null,
    ADRESSE              VARCHAR2(100)         not null,
-   TELEFON              INTEGER,
+   TELEFON              VARCHAR2(20),
    KONTAKTPERSON        VARCHAR2(50),
    constraint PK_LIEFERANT primary key (LIEFERANTID)
 );
@@ -326,8 +330,8 @@ create table LIEFERANT (
 /* Table: LIEFERANT_PRODUKT                                     */
 /*==============================================================*/
 create table LIEFERANT_PRODUKT (
-   LIEFERANTID          INTEGER               not null,
-   PRODUKTID            INTEGER               not null,
+   LIEFERANTID          NUMBER(20,0)          not null,
+   PRODUKTID            NUMBER(20,0)          not null,
    constraint PK_LIEFERANT_PRODUKT primary key (LIEFERANTID, PRODUKTID)
 );
 
@@ -349,8 +353,7 @@ create index LIEFERT_FK on LIEFERANT_PRODUKT (
 /* Table: MATERIAL                                              */
 /*==============================================================*/
 create table MATERIAL (
-   MATERIALID           INTEGER               not null,
-   LIEFERANTID          INTEGER               not null,
+   MATERIALID           NUMBER(20,0)          not null,
    BEZEICHNUNG          VARCHAR2(50),
    BESCHREIBUNG         VARCHAR2(1000),
    constraint PK_MATERIAL primary key (MATERIALID)
@@ -360,10 +363,10 @@ create table MATERIAL (
 /* Table: PREIS_HISTORIE                                        */
 /*==============================================================*/
 create table PREIS_HISTORIE (
-   PREISID              INTEGER               not null,
-   PRODUKTID            INTEGER               not null,
-   ALTER_PREIS          FLOAT(10)             not null,
-   NEUER_PREIS          FLOAT(10),
+   PREISID              NUMBER(20,0)          not null,
+   PRODUKTID            NUMBER(20,0)          not null,
+   ALTER_PREIS          NUMBER(10,2)          not null,
+   NEUER_PREIS          NUMBER(10,2),
    DATUM                DATE,
    constraint PK_PREIS_HISTORIE primary key (PREISID)
 );
@@ -379,15 +382,16 @@ create index PRODUKT_PREIS_HISTORY_FK on PREIS_HISTORIE (
 /* Table: PRODUKT                                               */
 /*==============================================================*/
 create table PRODUKT (
-   PRODUKTID            INTEGER               not null,
-   AKTIONID             INTEGER,
-   BESTELLUNGID         INTEGER,
-   BEWERTUNGSID         INTEGER,
-   LAGERID              INTEGER,
-   KATEGORIEID          INTEGER               not null,
-   AKTIV                SMALLINT              not null,
+   PRODUKTID            NUMBER(20,0)          not null,
+   AKTIONID             NUMBER(20,0),
+   BESTELLUNGID         NUMBER(20,0),
+   BEWERTUNGSID         NUMBER(20,0),
+   LAGERID              NUMBER(20,0),
+   KATEGORIEID          NUMBER(20,0)          not null,
+   AKTIV                CHAR(1)              default 'N'  not null
+      constraint CKC_AKTIV_PRODUKT check (AKTIV in ('Y','N')),
    NAME                 VARCHAR2(50),
-   BASISPREIS           FLOAT(10),
+   BASISPREIS           NUMBER(10,2),
    BESCHREIBUNG         VARCHAR2(1000),
    constraint PK_PRODUKT primary key (PRODUKTID)
 );
@@ -431,7 +435,7 @@ create index PRODUKT_LAGER_FK on PRODUKT (
 /* Table: PRODUKTKATEGORIE                                      */
 /*==============================================================*/
 create table PRODUKTKATEGORIE (
-   KATEGORIEID          INTEGER               not null,
+   KATEGORIEID          NUMBER(20,0)          not null,
    KATEGORIENNAME       VARCHAR2(50),
    BESCHREIBUNG         VARCHAR2(1000),
    constraint PK_PRODUKTKATEGORIE primary key (KATEGORIEID)
@@ -441,13 +445,14 @@ create table PRODUKTKATEGORIE (
 /* Table: PRODUKTVARIANTE                                       */
 /*==============================================================*/
 create table PRODUKTVARIANTE (
-   VARIANTEID           INTEGER               not null,
-   FARBENID             INTEGER               not null,
-   GROESSEID            INTEGER               not null,
-   PRODUKTID            INTEGER               not null,
-   MATERIALID           INTEGER               not null,
-   PREIS                FLOAT                 not null,
-   VERFUEGBAR           SMALLINT              not null,
+   VARIANTEID           NUMBER(20,0)          not null,
+   FARBENID             NUMBER(20,0)          not null,
+   GROESSEID            NUMBER(20,0)          not null,
+   PRODUKTID            NUMBER(20,0)          not null,
+   MATERIALID           NUMBER(20,0)          not null,
+   PREIS                NUMBER(10,2)          not null,
+   VERFUEGBAR           CHAR(1)              default 'N'  not null
+      constraint CKC_VERFUEGBAR_PRODUKTV check (VERFUEGBAR in ('Y','N')),
    constraint PK_PRODUKTVARIANTE primary key (VARIANTEID)
 );
 
@@ -459,9 +464,9 @@ create index PRODUKT_PRODUKTVARIANTE_FK on PRODUKTVARIANTE (
 );
 
 /*==============================================================*/
-/* Index: FARBE_PRODUKT_KONFIGURATION_FK                        */
+/* Index: FARBE_PRODUKT_FK                                      */
 /*==============================================================*/
-create index FARBE_PRODUKT_KONFIGURATION_FK on PRODUKTVARIANTE (
+create index FARBE_PRODUKT_FK on PRODUKTVARIANTE (
    FARBENID ASC
 );
 
@@ -483,8 +488,8 @@ create index GROESSE_PRODUKT_FK on PRODUKTVARIANTE (
 /* Table: RABATT                                                */
 /*==============================================================*/
 create table RABATT (
-   AKTIONID             INTEGER               not null,
-   RAPATT_PROZENT       FLOAT(3)              not null,
+   AKTIONID             NUMBER(20,0)          not null,
+   RAPATT_PROZENT       NUMBER(3,2)           not null,
    "START"              DATE                  not null,
    END                  DATE,
    BEZEICHNUG           VARCHAR2(50),
@@ -495,13 +500,13 @@ create table RABATT (
 /* Table: RUECKGABE                                             */
 /*==============================================================*/
 create table RUECKGABE (
-   REUCKGABEID          INTEGER               not null,
-   LAGERID              INTEGER,
-   VERKAUFID            INTEGER,
-   KUNDEID              INTEGER,
+   REUCKGABEID          NUMBER(20,0)          not null,
+   LAGERID              NUMBER(20,0),
+   VERKAUFID            NUMBER(20,0),
+   KUNDEID              NUMBER(20,0),
    DATUM                DATE                  not null,
    GRUND                VARCHAR2(1000)        not null,
-   BETRAG_ERSTATTUNG    FLOAT(10)             not null,
+   BETRAG_ERSTATTUNG    NUMBER(10,2)          not null,
    constraint PK_RUECKGABE primary key (REUCKGABEID)
 );
 
@@ -530,15 +535,14 @@ create index RELATIONSHIP_26_FK on RUECKGABE (
 /* Table: VERKAUF                                               */
 /*==============================================================*/
 create table VERKAUF (
-   VERKAUFID            INTEGER               not null,
-   ZAHLUNGSARTID        INTEGER               not null,
-   FILIALEID            INTEGER,
-   KUNDEID              INTEGER,
-   ANZAHL               INTEGER,
-   GESAMTPREIS          FLOAT(10),
+   VERKAUFID            NUMBER(20,0)          not null,
+   ZAHLUNGSARTID        NUMBER(20,0)          not null,
+   FILIALEID            NUMBER(20,0),
+   KUNDEID              NUMBER(20,0),
+   BETRAG               NUMBER(10,2),
    DATUM                DATE,
-   ZAHLUNGSTATUS        SMALLINT,
-   BETRAG               FLOAT(9),
+   ZAHLUNGSTATUS        CHAR(1)              default 'N'
+      constraint CKC_ZAHLUNGSTATUS_VERKAUF check (ZAHLUNGSTATUS is null or (ZAHLUNGSTATUS in ('Y','N'))),
    RECHNUNGSDATUM       DATE,
    constraint PK_VERKAUF primary key (VERKAUFID)
 );
@@ -568,7 +572,7 @@ create index ZAHLUNGSART_VERKAUF_FK on VERKAUF (
 /* Table: ZAHLUNGSART                                           */
 /*==============================================================*/
 create table ZAHLUNGSART (
-   ZAHLUNGSARTID        INTEGER               not null,
+   ZAHLUNGSARTID        NUMBER(20,0)          not null,
    BEZEICHNUNG          VARCHAR2(50)          not null,
    constraint PK_ZAHLUNGSART primary key (ZAHLUNGSARTID)
 );
