@@ -1,4 +1,6 @@
 package de.moebelhaus.bestellung;
 
-public class BestellungsPanel {
+import javax.swing.*;
+
+public class BestellungsPanel extends JPanel {
 }

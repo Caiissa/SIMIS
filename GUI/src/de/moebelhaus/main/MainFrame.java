@@ -1,8 +1,13 @@
 package de.moebelhaus.main;
 
+import de.moebelhaus.bestellung.BestellungsPanel;
+import de.moebelhaus.filiale.FilialenPanel;
 import de.moebelhaus.kunden.KundenPanel;
+import de.moebelhaus.lieferant.LieferantenPanel;
 import de.moebelhaus.produkte.ProduktPanel;
 import de.moebelhaus.lager.LagerPanel;
+import de.moebelhaus.rabatt.RabattPanel;
+import de.moebelhaus.rueckgabe.RueckgabenPanel;
 
 
 import javax.swing.*;
@@ -37,10 +42,20 @@ public class MainFrame extends JFrame {
         JButton kundenBtn = new JButton("Kunden");
         JButton produkteBtn = new JButton("Produkte");
         JButton lagerBtn = new JButton("Lager");
+        JButton bestellungBtn = new JButton("Bestellung");
+        JButton filialenBtn = new JButton("Filialen");
+        JButton lieferantBtn = new JButton("Lieferant");
+        JButton rabattBtn = new JButton("Rabatt");
+        JButton rueckgabeBtn = new JButton("Rueckgabe");
 
         kundenBtn.addActionListener(e -> showPanel(new KundenPanel()));
         produkteBtn.addActionListener(e -> showPanel(new ProduktPanel()));
         lagerBtn.addActionListener(e -> showPanel(new LagerPanel()));
+        bestellungBtn.addActionListener(e -> {showPanel(new BestellungsPanel());});
+        filialenBtn.addActionListener(e -> showPanel(new FilialenPanel()));
+        lieferantBtn.addActionListener(e -> showPanel(new LieferantenPanel()));
+        rabattBtn.addActionListener(e -> showPanel(new RabattPanel()));
+        rueckgabeBtn.addActionListener(e -> showPanel(new RueckgabenPanel()));
 
         menu.add(lagerBtn);
         menu.add(kundenBtn);
