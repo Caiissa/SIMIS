@@ -33,7 +33,7 @@ public class LoginFrame extends JFrame {
             String user = userField.getText();
             String pass = new String(passField.getPassword());
 
-            if (user.equals("0") && pass.equals("0")) {
+            if (user.equals("SIMIS") && pass.equals("0000")) {
                 dispose();
                 new MainFrame();
             } else {

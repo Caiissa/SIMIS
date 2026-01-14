@@ -18,7 +18,7 @@ public class BestellungDAO {
             FROM BESTELLUNG
             WHERE CAST(BESTELLUNGID AS CHAR) LIKE ?
                OR LOWER(STATUS) LIKE ?
-            ORDER BY DATUM_BESTELLUNG DESC
+            ORDER BY DATUM_BESTELLUNG ASC
         """;
 
         try (Connection con = DBConnection.getConnection();

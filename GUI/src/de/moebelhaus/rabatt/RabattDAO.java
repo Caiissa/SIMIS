@@ -17,7 +17,7 @@ public class RabattDAO {
             FROM RABATT
             WHERE CAST(AKTIONID AS CHAR) LIKE ?
                OR LOWER(BEZEICHNUG) LIKE ?
-            ORDER BY START_DATUM DESC
+            ORDER BY START_DATUM ASC
         """;
 
         try (Connection con = DBConnection.getConnection();

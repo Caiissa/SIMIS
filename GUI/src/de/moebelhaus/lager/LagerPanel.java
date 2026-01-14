@@ -1,5 +1,7 @@
 package de.moebelhaus.lager;
 
+import de.moebelhaus.produkte.Produkt;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -7,54 +9,85 @@ import java.util.List;
 
 public class LagerPanel extends JPanel {
 
-    private DefaultTableModel model;
+    private JTable lagerTable;
+    private JTable produktTable;
+
+    private DefaultTableModel lagerModel;
+    private DefaultTableModel produktModel;
+
+    private LagerDAO lagerDAO;
 
     public LagerPanel() {
+        lagerDAO = new LagerDAO();
         setLayout(new BorderLayout());
 
-        JTextField sucheField = new JTextField();
-        JButton suchenBtn = new JButton("Suchen");
+        // ===== Lager Tabelle =====
+        lagerModel = new DefaultTableModel(
+                new String[]{"LagerID", "BestellungID", "Menge verfügbar"}, 0
+        );
+        lagerTable = new JTable(lagerModel);
+        lagerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JPanel top = new JPanel(new BorderLayout());
-        top.add(new JLabel("Lager durchsuchen:"), BorderLayout.WEST);
-        top.add(sucheField, BorderLayout.CENTER);
-        top.add(suchenBtn, BorderLayout.EAST);
+        JScrollPane lagerScroll = new JScrollPane(lagerTable);
 
-        add(top, BorderLayout.NORTH);
-
-        model = new DefaultTableModel(
-                new Object[]{"Lager-ID", "Bestellung-ID", "Menge verfügbar"}, 0
+        // ===== Produkt Tabelle =====
+        produktModel = new DefaultTableModel(
+                new String[]{"ProduktID", "Name", "Basispreis", "Aktiv"}, 0
         );
 
-        JTable table = new JTable(model);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        produktTable = new JTable(produktModel);
 
-        loadLager("");
+        JScrollPane produktScroll = new JScrollPane(produktTable);
 
-        suchenBtn.addActionListener(e -> {
-            model.setRowCount(0);
-            List<Lager> lagerListe = LagerDAO.searchLager(sucheField.getText());
+        // ===== Split =====
+        JSplitPane splitPane = new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT,
+                lagerScroll,
+                produktScroll
+        );
+        splitPane.setDividerLocation(400);
+        add(splitPane, BorderLayout.CENTER);
 
-            for (Lager l : lagerListe) {
-                model.addRow(new Object[]{
-                        l.getLagerID(),
-                        l.getBestellungID(),
-                        l.getMengeVerfuegbar()
-                });
+        // ===== Daten laden =====
+        ladeLager();
+
+        // ===== Listener =====
+        lagerTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int row = lagerTable.getSelectedRow();
+                if (row != -1) {
+                    int lagerID = (int) lagerModel.getValueAt(row, 0);
+                    ladeProdukte(lagerID);
+                }
             }
         });
     }
 
-    private void loadLager(String suchtext) {
-        model.setRowCount(0);
-        List<Lager> lagerListe = LagerDAO.searchLager(suchtext);
+    private void ladeLager() {
+        lagerModel.setRowCount(0);
+        List<Lager> lagerListe = lagerDAO.getAlleLager();
 
         for (Lager l : lagerListe) {
-            model.addRow(new Object[]{
+            lagerModel.addRow(new Object[]{
                     l.getLagerID(),
                     l.getBestellungID(),
                     l.getMengeVerfuegbar()
             });
         }
     }
+
+    private void ladeProdukte(int lagerID) {
+        produktModel.setRowCount(0);
+        List<Produkt> produkte = lagerDAO.getProdukteZuLager(lagerID);
+
+        for (Produkt p : produkte) {
+            produktModel.addRow(new Object[]{
+                    p.getProduktId(),
+                    p.getName(),
+                    p.getBasispreis(),
+                    p.isAktiv()
+            });
+        }
+    }
+
 }

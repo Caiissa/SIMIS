@@ -1,38 +1,34 @@
 package de.moebelhaus.lager;
 
 import de.moebelhaus.DBConnection;
+import de.moebelhaus.produkte.Produkt;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LagerDAO {
 
-    public static List<Lager> searchLager(String suchtext) {
+    // ================= Lager =================
+    public List<Lager> getAlleLager() {
         List<Lager> lagerListe = new ArrayList<>();
 
         String sql = """
-    SELECT L.LAGERID, L.BESTELLUNGID, L.MENGE_VERFUEGBAR
-    FROM LAGER L
-    LEFT JOIN PRODUKT_LAGER PL ON L.LAGERID = PL.LAGERID
-    WHERE TO_CHAR(L.LAGERID) LIKE ?
-       OR TO_CHAR(L.BESTELLUNGID) LIKE ?
-    ORDER BY L.LAGERID
-""";
+            SELECT lagerID, bestellungID, menge_verfuegbar
+            FROM lager
+        """;
 
-
-        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, "%" + suchtext + "%");
-            ps.setString(2, "%" + suchtext + "%");
-
-            ResultSet rs = ps.executeQuery();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                lagerListe.add(new Lager(rs.getInt("LAGERID"), rs.getInt("BESTELLUNGID"), rs.getInt("MENGE_VERFUEGBAR")));
+                Lager lager = new Lager(
+                        rs.getInt("lagerID"),
+                        rs.getInt("bestellungID"),
+                        rs.getInt("menge_verfuegbar")
+                );
+                lagerListe.add(lager);
             }
 
         } catch (SQLException e) {
@@ -40,5 +36,40 @@ public class LagerDAO {
         }
 
         return lagerListe;
+    }
+
+    // ================= Produkte zu Lager =================
+    public List<Produkt> getProdukteZuLager(int lagerID) {
+        List<Produkt> produkte = new ArrayList<>();
+
+        String sql = """
+            SELECT p.produktID, p.name, p.basispreis, p.aktiv
+            FROM produkt_lager pl
+            JOIN produkt p ON p.produktID = pl.produktID
+            WHERE pl.lagerID = ?
+        """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, lagerID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Produkt produkt = new Produkt(
+                            rs.getInt("produktID"),
+                            rs.getString("name"),
+                            rs.getDouble("basispreis"),
+                            rs.getBoolean("aktiv")
+                    );
+                    produkte.add(produkt);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return produkte;
     }
 }
