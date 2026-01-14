@@ -23,7 +23,7 @@ public class LagerPanel extends JPanel {
 
         // ===== Lager Tabelle =====
         lagerModel = new DefaultTableModel(
-                new String[]{"LagerID", "BestellungID", "Menge verfügbar"}, 0
+                new String[]{"LagerID", "BestellungID", "Anzahl Produkte"}, 0
         );
         lagerTable = new JTable(lagerModel);
         lagerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
