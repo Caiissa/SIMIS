@@ -19,7 +19,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         setTitle("SIMIS – Verwaltungssoftware");
-        setSize(1100, 700);
+        setSize(1900, 1080);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());

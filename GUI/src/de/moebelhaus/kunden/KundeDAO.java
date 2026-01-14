@@ -17,7 +17,6 @@ public class KundeDAO {
             FROM KUNDE
             WHERE LOWER(VORNAME) LIKE ?
                OR LOWER(NACHNAME) LIKE ?
-            // ORDER BY KUNDEID ASC
         """;
 
         try (Connection con = DBConnection.getConnection();
