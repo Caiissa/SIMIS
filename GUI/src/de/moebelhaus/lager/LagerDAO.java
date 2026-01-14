@@ -9,7 +9,6 @@ import java.util.List;
 
 public class LagerDAO {
 
-    // ================= Lager =================
     public List<Lager> getAlleLager() {
         List<Lager> lagerListe = new ArrayList<>();
 
@@ -38,7 +37,6 @@ public class LagerDAO {
         return lagerListe;
     }
 
-    // ================= Produkte zu Lager =================
     public List<Produkt> getProdukteZuLager(int lagerID) {
         List<Produkt> produkte = new ArrayList<>();
 
