@@ -10,3 +10,12 @@
     <orderEntry type="library" name="ojdbc17" level="project" />
   </component>
 </module>
+
+Struktur:
+Wir fanden das Wasserfall Modell besser, da wir von Anfang an den gesamten Prozess planen konnten. Beim Scrum Modell dagegen hatten wir nach dem ersten Sprint Probleme mit dem Zeitmanagement, da wir erst auf das Feedback eingegangen sind und danach keine Zeit mehr für alle Anforderungen hatten.
+
+Fehler:
+Beim Wasserfall Modell hatten wir bis zum Schluss keinen Kontakt zum „Kunden“, weshalb wir auch erst am Ende wussten, was wir falsch gemacht haben. Dagegen ist uns beim Scrum schon nach dem ersten Sprint bewusst gemacht worden, dass wir an der Idee des Kunden teilweise vorbeientwickelt haben. 
+
+Transfer:
+Scrum eignet sich unserer Meinung nach für Projekte mit unklaren oder sich ändernden Anforderungen, da Feedback früh integriert wird. Das Wasserfallmodell ist dagegen sinnvoller bei klar Definierten Projekten mit wenig Änderungsbedarf. In der Praxis ist Srum meist flexibler und besser für Softwareprojekte mit Kundenbeteiligung geeignet.
